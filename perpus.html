@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Sistem Informasi Perpustakaan</title>
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", system-ui, Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6fa;
+            color: #1e293b;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== VARIABEL WARNA ===== */
+        :root {
+            --primary: #6366f1; /* Ungu Indigo */
+            --primary-light: #e0e7ff;
+            --secondary: #3b82f6; /* Biru */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-card: #ffffff;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            --radius: 16px;
+        }
+
+        /* ===== SIDEBAR (DESKTOP) ===== */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-card);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .brand-icon {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            width: 100%;
+        }
+
+        .nav-btn:hover {
+            background: #f8fafc;
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            overflow-y: auto;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-card);
+            padding: 0.5rem 1rem 0.5rem 0.5rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .profile-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* ===== INFO CARDS ===== */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .info-icon.blue { background: #e0f2fe; color: #0284c7; }
+        .info-icon.purple { background: #f3e8ff; color: #9333ea; }
+        .info-icon.orange { background: #ffedd5; color: #ea580c; }
+
+        .info-content .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .info-content .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        /* ===== SECTIONS ===== */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* ===== SEARCH BOX & ACTION HEADER ===== */
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex: 1 1 auto;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1 1 200px;
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.8rem;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-style: normal;
+            font-size: 1.1rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ===== TOMBOL TAMBAH BUKU ===== */
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+            transition: 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        /* ===== TABEL ===== */
+        .card-container {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 600px; /* Lebar minimum tabel agar rapi */
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-tersedia {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-dipinjam {
+            background: #fef08a;
+            color: #854d0e;
+        }
+
+        /* ===== TOMBOL AKSI (EDIT & HAPUS) ===== */
+        .btn-icon {
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            margin-right: 4px;
+        }
+
+        .btn-icon:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-icon.edit { color: #0284c7; }
+        .btn-icon.edit:hover { background: #e0f2fe; }
+        
+        .btn-icon.delete { color: #dc2626; }
+        .btn-icon.delete:hover { background: #fee2e2; }
+
+        /* ===== FORM PEMINJAMAN ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding: 1rem 0;
+            width: 100%;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s;
+            max-width: 100%;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+        .btn-small {
+            background: #f1f5f9;
+            border: none;
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-small.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-small.danger:hover {
+            background: #fecaca;
+        }
+
+        /* ===== INFO & KONTAK ===== */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .contact-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-icon {
+            font-size: 1.8rem;
+            line-height: 1;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .contact-detail h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-detail p, .contact-detail li {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            list-style: none;
+            margin-bottom: 0.3rem;
+            line-height: 1.5;
+        }
+
+        .rule-list li {
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .rule-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* ===== MODAL (POP-UP CRUD) ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 500px;
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            box-shadow: var(--shadow-md);
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-close:hover {
+            color: #ef4444;
+        }
+
+        /* ===== BOTTOM NAV (MOBILE) ===== */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            padding: 0.8rem 1rem;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+            justify-content: space-around;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .bottom-nav .nav-btn {
+            flex-direction: column;
+            gap: 4px;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            text-align: center;
+            background: transparent;
+        }
+
+        .bottom-nav .nav-btn.active {
+            background: transparent;
+            color: var(--primary);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-message {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1100;
+            animation: fadeInUp 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 3rem 1rem !important;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ===== RESPONSIF ===== */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .bottom-nav { display: flex; }
+            .main-content { padding: 1.5rem 1rem 6rem 1rem; }
+            
+            .header-title h1 { font-size: 1.4rem; }
+            
+            /* Profil Tetap Muncul di Mobile (Hanya Avatar) */
+            .profile-text { display: none; }
+            .header-profile { padding: 0.4rem; }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .info-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            .info-card { padding: 1rem; }
+            .info-content .value { font-size: 1.5rem; }
+
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
+            .search-box {
+                max-width: 100%;
+            }
+            .btn-add {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .info-cards {
+                grid-template-columns: 1fr; 
+            }
+            .section-header { 
+                flex-direction: column; 
+                align-items: stretch; 
+                gap: 0.8rem; 
+            }
+            .search-box { 
+                max-width: 100%;
+                width: 100%;
+                flex: none; 
+            }
+            .search-box input {
+                padding-top: 0.7rem;
+                padding-bottom: 0.7rem;
+                font-size: 0.85rem;
+            }
+            .card-container {
+                padding: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR (DESKTOP) ===== -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">📚</div>
+            PerpusKu
+        </div>
+        <nav class="nav-menu">
+            <button class="nav-btn active" data-page="katalog">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                Katalog Buku
+            </button>
+            <button class="nav-btn" data-page="peminjaman">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Form Peminjaman
+            </button>
+            <button class="nav-btn" data-page="transaksi">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Data Transaksi
+            </button>
+            <button class="nav-btn" data-page="informasi">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Informasi & Kontak
+            </button>
+        </nav>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-title">
+                <h1>Selamat Datang 👋</h1>
+                <p>Sistem Informasi Perpustakaan Offline</p>
+            </div>
+            <div class="header-profile">
+                <div class="avatar">AD</div>
+                <div class="profile-text">Admin Perpus</div>
+            </div>
+        </header>
+
+        <!-- 3 KARTU INFORMASI RINGKAS -->
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-icon blue">📚</div>
+                <div class="info-content">
+                    <div class="label">Total Koleksi</div>
+                    <div class="value" id="totalKoleksi">0</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon purple">✅</div>
+                <div class="info-content">
+                    <div class="label">Buku Tersedia</div>
+                    <div class="value" id="totalTersedia">0</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon orange">🕒</div>
+                <div class="info-content">
+                    <div class="label">Sedang Dipinjam</div>
+                    <div class="value" id="totalDipinjam">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HALAMAN: KATALOG ===== -->
+        <section id="page-katalog" class="page-section active">
+            <div class="section-header">
+                <h2>📖 Katalog & Stok Buku</h2>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i>🔍</i>
+                        <input type="text" id="searchInput" placeholder="Cari judul, kategori, rak...">
+                    </div>
+                    <button class="btn-add" id="btnTambahBuku">+ Tambah Buku</button>
+                </div>
+            </div>
+            <div class="card-container">
+                <div class="table-wrapper">
+                    <table id="tabelBuku">
+                        <thead>
+                            <tr>
+                                <th>Judul</th>
+                                <th>Kategori</th>
+                                <th>Lokasi Rak</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyBuku"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== HALAMAN: FORM PEMINJAMAN ===== -->
+        <section id="page-peminjaman" class="page-section">
+            <div class="section-header">
+                <h2>📝 Form Peminjaman Buku</h2>
+            </div>
+            <div class="card-container">
+                <form id="formPeminjaman">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="namaAnggota">Nama Anggota</label>
+                            <input type="text" id="namaAnggota" placeholder="Contoh: Rina Wijaya" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="judulBuku">Judul Buku</label>
+                            <select id="judulBuku" required>
+                                <option value="">-- Pilih Buku --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tanggalPinjam">Tanggal Pinjam</label>
+                            <input type="date" id="tanggalPinjam" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">📌 Catat Peminjaman</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ===== HALAMAN: DATA TRANSAKSI ===== -->
+        <section id="page-transaksi" class="page-section">
+            <div class="section-header">
+                <h2>📋 Transaksi Berlangsung</h2>
+                <button id="btnResetTransaksi" class="btn-small danger">↻ Reset Semua</button>
+            </div>
+            <div class="card-container">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Anggota</th>
+                                <th>Judul Buku</th>
+                                <th>Tanggal Pinjam</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyTransaksi"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== HALAMAN: INFORMASI & KONTAK ===== -->
+        <section id="page-informasi" class="page-section">
+            <div class="section-header">
+                <h2>ℹ️ Informasi & Kontak</h2>
+            </div>
+            <div class="card-container">
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <div class="contact-icon">⏰</div>
+                        <div class="contact-detail">
+                            <h3>Jam Operasional</h3>
+                            <p>Senin – Jumat: 08.00 – 16.00</p>
+                            <p>Sabtu: 09.00 – 13.00</p>
+                            <p>Minggu & Hari Libur: Tutup</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📜</div>
+                        <div class="contact-detail">
+                            <h3>Aturan Peminjaman</h3>
+                            <ul class="rule-list">
+                                <li>Maksimal 3 buku per anggota</li>
+                                <li>Durasi peminjaman 7 hari</li>
+                                <li>Denda keterlambatan Rp2.000/hari</li>
+                                <li>Buku harus dikembalikan dalam kondisi baik</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-detail">
+                            <h3>Alamat & Kontak</h3>
+                            <p>Jl. Pendidikan No. 42, Lt. 2</p>
+                            <p>Kota Buku, 40123</p>
+                            <p>📞 (022) 1234-567</p>
+                            <p>✉️ perpus@sekolah.sch.id</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== BOTTOM NAV (MOBILE) ===== -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-page="katalog">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            Katalog
+        </button>
+        <button class="nav-btn" data-page="peminjaman">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            Pinjam
+        </button>
+        <button class="nav-btn" data-page="transaksi">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            Transaksi
+        </button>
+        <button class="nav-btn" data-page="informasi">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Info
+        </button>
+    </nav>
+
+    <!-- ===== MODAL CRUD BUKU ===== -->
+    <div class="modal-overlay" id="modalBuku">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Buku Baru</h3>
+                <button class="btn-close" id="btnCloseModal">&times;</button>
+            </div>
+            <form id="formBuku">
+                <input type="hidden" id="bukuId">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="inputJudul">Judul Buku</label>
+                    <input type="text" id="inputJudul" placeholder="Masukkan judul buku..." required>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="inputKategori">Kategori</label>
+                    <input type="text" id="inputKategori" placeholder="Contoh: Fiksi, Akademik..." required>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="inputRak">Lokasi Rak</label>
+                    <input type="text" id="inputRak" placeholder="Contoh: A-01" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="inputStatus">Status</label>
+                    <select id="inputStatus" required>
+                        <option value="Tersedia">Tersedia</option>
+                        <option value="Dipinjam">Dipinjam</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="margin-top: 0;">💾 Simpan Buku</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPT ===== -->
+    <script>
+        (function() {
+            // ---------- DATA BUKU FISIK ----------
+            let bukuList = [
+                { id: 1, judul: "Laskar Pelangi", kategori: "Fiksi", rak: "A-01", status: "Tersedia" },
+                { id: 2, judul: "Bumi Manusia", kategori: "Fiksi", rak: "A-02", status: "Tersedia" },
+                { id: 3, judul: "Sapiens", kategori: "Non-Fiksi", rak: "B-03", status: "Dipinjam" },
+                { id: 4, judul: "Filosofi Teras", kategori: "Non-Fiksi", rak: "B-01", status: "Tersedia" },
+                { id: 5, judul: "The Hobbit", kategori: "Fantasi", rak: "C-02", status: "Dipinjam" },
+                { id: 6, judul: "Pengantar Ilmu Hukum", kategori: "Akademik", rak: "D-04", status: "Tersedia" },
+                { id: 7, judul: "Negeri 5 Menara", kategori: "Fiksi", rak: "A-03", status: "Tersedia" },
+                { id: 8, judul: "Algoritma dan Pemrograman", kategori: "Akademik", rak: "D-01", status: "Dipinjam" }
+            ];
+
+            // ---------- DATA TRANSAKSI (peminjaman berlangsung) ----------
+            let transaksiList = [
+                { id: 1, nama: "Andi Pratama", bukuId: 3, judulBuku: "Sapiens", tanggal: "2025-02-10" },
+                { id: 2, nama: "Sinta Dewi", bukuId: 5, judulBuku: "The Hobbit", tanggal: "2025-02-12" },
+                { id: 3, nama: "Rizky Ramadhan", bukuId: 8, judulBuku: "Algoritma dan Pemrograman", tanggal: "2025-02-13" }
+            ];
+
+            // ---------- ELEMEN DOM ----------
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const pages = {
+                katalog: document.getElementById('page-katalog'),
+                peminjaman: document.getElementById('page-peminjaman'),
+                transaksi: document.getElementById('page-transaksi'),
+                informasi: document.getElementById('page-informasi')
+            };
+
+            const tbodyBuku = document.getElementById('tbodyBuku');
+            const tbodyTransaksi = document.getElementById('tbodyTransaksi');
+            const searchInput = document.getElementById('searchInput');
+            const selectJudul = document.getElementById('judulBuku');
+            const formPeminjaman = document.getElementById('formPeminjaman');
+            const namaAnggotaInput = document.getElementById('namaAnggota');
+            const tanggalPinjamInput = document.getElementById('tanggalPinjam');
+            const btnResetTransaksi = document.getElementById('btnResetTransaksi');
+
+            const totalKoleksiEl = document.getElementById('totalKoleksi');
+            const totalTersediaEl = document.getElementById('totalTersedia');
+            const totalDipinjamEl = document.getElementById('totalDipinjam');
+
+            // Elemen Modal CRUD
+            const modalBuku = document.getElementById('modalBuku');
+            const btnTambahBuku = document.getElementById('btnTambahBuku');
+            const btnCloseModal = document.getElementById('btnCloseModal');
+            const formBuku = document.getElementById('formBuku');
+            const modalTitle = document.getElementById('modalTitle');
+            const inputBukuId = document.getElementById('bukuId');
+            const inputJudul = document.getElementById('inputJudul');
+            const inputKategori = document.getElementById('inputKategori');
+            const inputRak = document.getElementById('inputRak');
+            const inputStatus = document.getElementById('inputStatus');
+
+            // ---------- FUNGSI BANTU ----------
+            function formatDateIndo(dateStr) {
+                if (!dateStr) return '-';
+                const parts = dateStr.split('-');
+                if (parts.length !== 3) return dateStr;
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            function showToast(msg) {
+                const existing = document.querySelector('.toast-message');
+                if (existing) existing.remove();
+                const toast = document.createElement('div');
+                toast.className = 'toast-message';
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    if (toast) toast.remove();
+                }, 2500);
+            }
+
+            // ---------- UPDATE STATISTIK (3 KARTU) ----------
+            function updateStatistik() {
+                const total = bukuList.length;
+                const tersedia = bukuList.filter(b => b.status === 'Tersedia').length;
+                const dipinjam = bukuList.filter(b => b.status === 'Dipinjam').length;
+                totalKoleksiEl.textContent = total;
+                totalTersediaEl.textContent = tersedia;
+                totalDipinjamEl.textContent = dipinjam;
+            }
+
+            // ---------- RENDER TABEL BUKU (dengan filter search) ----------
+            function renderTabelBuku(filterText = '') {
+                const keyword = filterText.trim().toLowerCase();
+                const filtered = bukuList.filter(b => 
+                    b.judul.toLowerCase().includes(keyword) || 
+                    b.kategori.toLowerCase().includes(keyword) || 
+                    b.rak.toLowerCase().includes(keyword)
+                );
+
+                if (filtered.length === 0) {
+                    tbodyBuku.innerHTML = `<tr class="empty-row"><td colspan="5">📭 Tidak ada buku yang cocok.</td></tr>`;
+                    return;
+                }
+
+                let html = '';
+                filtered.forEach(b => {
+                    const statusClass = b.status === 'Tersedia' ? 'status-tersedia' : 'status-dipinjam';
+                    html += `<tr>
+                        <td><strong>${b.judul}</strong></td>
+                        <td>${b.kategori}</td>
+                        <td>${b.rak}</td>
+                        <td><span class="status-badge ${statusClass}">${b.status}</span></td>
+                        <td>
+                            <button class="btn-icon edit" title="Edit Buku" onclick="window.editBuku(${b.id})">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </button>
+                            <button class="btn-icon delete" title="Hapus Buku" onclick="window.hapusBuku(${b.id})">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+                tbodyBuku.innerHTML = html;
+            }
+
+            // ---------- RENDER SELECT JUDUL BUKU (hanya yang tersedia) ----------
+            function renderSelectBuku() {
+                const tersedia = bukuList.filter(b => b.status === 'Tersedia');
+                if (tersedia.length === 0) {
+                    selectJudul.innerHTML = `<option value="">-- Tidak ada buku tersedia --</option>`;
+                    return;
+                }
+                let html = `<option value="">-- Pilih Buku --</option>`;
+                tersedia.forEach(b => {
+                    html += `<option value="${b.id}">${b.judul} (${b.kategori}) - Rak ${b.rak}</option>`;
+                });
+                selectJudul.innerHTML = html;
+            }
+
+            // ---------- RENDER TABEL TRANSAKSI ----------
+            function renderTransaksi() {
+                if (transaksiList.length === 0) {
+                    tbodyTransaksi.innerHTML = `<tr class="empty-row"><td colspan="4">📭 Belum ada transaksi peminjaman.</td></tr>`;
+                    return;
+                }
+                let html = '';
+                transaksiList.forEach((trx) => {
+                    html += `<tr>
+                        <td><strong>${trx.nama}</strong></td>
+                        <td>${trx.judulBuku}</td>
+                        <td>${formatDateIndo(trx.tanggal)}</td>
+                        <td>
+                            <button class="btn-small" onclick="window.kembalikanBuku(${trx.id})" style="background:#e0f2fe; color:#0284c7;">✅ Kembalikan</button>
+                        </td>
+                    </tr>`;
+                });
+                tbodyTransaksi.innerHTML = html;
+            }
+
+            // ---------- FUNGSI KEMBALIKAN BUKU (global) ----------
+            window.kembalikanBuku = function(transaksiId) {
+                const trx = transaksiList.find(t => t.id === transaksiId);
+                if (!trx) return;
+
+                const buku = bukuList.find(b => b.id === trx.bukuId);
+                if (buku && buku.status === 'Dipinjam') {
+                    buku.status = 'Tersedia';
+                }
+
+                transaksiList = transaksiList.filter(t => t.id !== transaksiId);
+
+                refreshAll();
+                showToast(`📚 Buku "${trx.judulBuku}" telah dikembalikan.`);
+            };
+
+            // ---------- FUNGSI CRUD BUKU ----------
+            
+            // Buka Modal untuk Tambah
+            btnTambahBuku.addEventListener('click', () => {
+                modalTitle.textContent = "Tambah Buku Baru";
+                formBuku.reset();
+                inputBukuId.value = "";
+                modalBuku.classList.add('active');
+            });
+
+            // Tutup Modal
+            btnCloseModal.addEventListener('click', () => {
+                modalBuku.classList.remove('active');
+            });
+            
+            // Tutup Modal jika klik di luar area modal
+            modalBuku.addEventListener('click', (e) => {
+                if (e.target === modalBuku) {
+                    modalBuku.classList.remove('active');
+                }
+            });
+
+            // Simpan Data (Create / Update)
+            formBuku.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const id = inputBukuId.value;
+                const judul = inputJudul.value.trim();
+                const kategori = inputKategori.value.trim();
+                const rak = inputRak.value.trim();
+                const status = inputStatus.value;
+
+                if (id) {
+                    // Proses Update
+                    const index = bukuList.findIndex(b => b.id == id);
+                    if (index !== -1) {
+                        bukuList[index] = { ...bukuList[index], judul, kategori, rak, status };
+                        showToast(`✅ Buku "${judul}" berhasil diperbarui.`);
+                    }
+                } else {
+                    // Proses Create
+                    const newId = bukuList.length > 0 ? Math.max(...bukuList.map(b => b.id)) + 1 : 1;
+                    bukuList.push({ id: newId, judul, kategori, rak, status });
+                    showToast(`✅ Buku "${judul}" berhasil ditambahkan.`);
+                }
+
+                modalBuku.classList.remove('active');
+                refreshAll();
+            });
+
+            // Buka Modal untuk Edit
+            window.editBuku = function(id) {
+                const buku = bukuList.find(b => b.id === id);
+                if (!buku) return;
+
+                modalTitle.textContent = "Edit Data Buku";
+                inputBukuId.value = buku.id;
+                inputJudul.value = buku.judul;
+                inputKategori.value = buku.kategori;
+                inputRak.value = buku.rak;
+                inputStatus.value = buku.status;
+
+                modalBuku.classList.add('active');
+            };
+
+            // Hapus Buku
+            window.hapusBuku = function(id) {
+                const buku = bukuList.find(b => b.id === id);
+                if (!buku) return;
+
+                // Cek apakah buku sedang dipinjam
+                if (buku.status === 'Dipinjam') {
+                    if(!confirm(`Buku "${buku.judul}" sedang dipinjam. Yakin ingin menghapusnya? (Transaksi terkait akan dihapus)`)) return;
+                    
+                    // Hapus transaksi terkait jika buku dihapus paksa
+                    transaksiList = transaksiList.filter(t => t.bukuId !== id);
+                } else {
+                    if(!confirm(`Yakin ingin menghapus buku "${buku.judul}"?`)) return;
+                }
+
+                // Hapus dari array
+                bukuList = bukuList.filter(b => b.id !== id);
+                refreshAll();
+                showToast(`🗑️ Buku "${buku.judul}" telah dihapus.`);
+            };
+
+            // ---------- REFRESH SEMUA TAMPILAN ----------
+            function refreshAll() {
+                updateStatistik();
+                renderTabelBuku(searchInput.value);
+                renderSelectBuku();
+                renderTransaksi();
+            }
+
+            // ---------- NAVIGASI ----------
+            function setActivePage(pageId) {
+                navBtns.forEach(btn => {
+                    if (btn.dataset.page === pageId) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                Object.keys(pages).forEach(key => {
+                    if (key === pageId) {
+                        pages[key].classList.add('active');
+                    } else {
+                        pages[key].classList.remove('active');
+                    }
+                });
+            }
+
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setActivePage(btn.dataset.page);
+                });
+            });
+
+            // ---------- SEARCH BAR ----------
+            searchInput.addEventListener('input', (e) => {
+                renderTabelBuku(e.target.value);
+            });
+
+            // ---------- FORM PEMINJAMAN ----------
+            formPeminjaman.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const nama = namaAnggotaInput.value.trim();
+                const bukuId = parseInt(selectJudul.value, 10);
+                const tanggal = tanggalPinjamInput.value;
+
+                if (!nama) {
+                    showToast('⚠️ Nama anggota harus diisi.');
+                    return;
+                }
+                if (!bukuId) {
+                    showToast('⚠️ Pilih buku yang akan dipinjam.');
+                    return;
+                }
+                if (!tanggal) {
+                    showToast('⚠️ Tanggal pinjam harus diisi.');
+                    return;
+                }
+
+                const buku = bukuList.find(b => b.id === bukuId);
+                if (!buku) {
+                    showToast('❌ Buku tidak ditemukan.');
+                    return;
+                }
+                if (buku.status !== 'Tersedia') {
+                    showToast('⚠️ Buku sedang dipinjam, tidak tersedia.');
+                    return;
+                }
+
+                const newId = transaksiList.length > 0 ? Math.max(...transaksiList.map(t => t.id)) + 1 : 1;
+                const transaksiBaru = {
+                    id: newId,
+                    nama: nama,
+                    bukuId: buku.id,
+                    judulBuku: buku.judul,
+                    tanggal: tanggal
+                };
+                transaksiList.push(transaksiBaru);
+
+                buku.status = 'Dipinjam';
+
+                namaAnggotaInput.value = '';
+                selectJudul.value = '';
+                tanggalPinjamInput.value = '';
+
+                refreshAll();
+                showToast(`✅ Peminjaman "${buku.judul}" oleh ${nama} berhasil dicatat.`);
+            });
+
+            // Set tanggal default hari ini
+            function setDefaultDate() {
+                const today = new Date().toISOString().split('T')[0];
+                tanggalPinjamInput.value = today;
+                tanggalPinjamInput.min = today;
+            }
+
+            // ---------- RESET SEMUA TRANSAKSI ----------
+            btnResetTransaksi.addEventListener('click', () => {
+                if (transaksiList.length === 0) {
+                    showToast('Tidak ada transaksi untuk direset.');
+                    return;
+                }
+                if (!confirm('Yakin ingin mereset semua transaksi? Semua buku akan dikembalikan.')) return;
+
+                transaksiList.forEach(trx => {
+                    const buku = bukuList.find(b => b.id === trx.bukuId);
+                    if (buku && buku.status === 'Dipinjam') {
+                        buku.status = 'Tersedia';
+                    }
+                });
+
+                transaksiList = [];
+
+                refreshAll();
+                showToast('🔄 Semua transaksi telah direset. Buku tersedia kembali.');
+            });
+
+            // ---------- INISIALISASI ----------
+            function init() {
+                setDefaultDate();
+                refreshAll();
+                setActivePage('katalog');
+            }
+
+            init();
+
+        })();
+    </script>
+</body>
+</html>
